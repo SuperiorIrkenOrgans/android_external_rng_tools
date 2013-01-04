@@ -8,7 +8,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -19,12 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#define _GNU_SOURCE
-
-#ifndef HAVE_CONFIG_H
-#error Invalid or missing autoconf build environment
-#endif
-
 #include "rng-tools-config.h"
 
 #include <unistd.h>
@@ -32,7 +26,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
-#include <syslog.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -91,10 +84,9 @@ static int get_rng_proc_parameter(const char* param, long int *value)
 		*value = curvalue;
 	} else error = 1;
 	if (fp != NULL) error |= fclose(fp);
-	
+
 	if (error) {
-		message_strerr(LOG_WARNING, error,
-			"Cannot read %s", procname);
+		ALOGW("Cannot read %s", procname);
 		return -1;
 	}
 	return 0;
@@ -105,7 +97,7 @@ static int set_rng_proc_parameter(const char* param, long int *value)
 {
 	FILE *fp = NULL;
 	int error = 0;
-	
+
 	long int curvalue;
 	char procname[512];
 
@@ -119,17 +111,15 @@ static int set_rng_proc_parameter(const char* param, long int *value)
 		if ( *value > curvalue ) {
 			rewind(fp);
 			fprintf(fp, "%ld\n", *value);
-			message(LOG_NOTICE, "Setting %s to %ld",
-				procname, *value);
+			ALOGI("Setting %s to %ld", procname, *value);
 		} else {
 			*value = curvalue;
 		}
 	} else error = 1;
 	if (fp != NULL) error |= fclose(fp);
-	
+
 	if (error) {
-		message_strerr(LOG_WARNING, errno,
-			"Cannot set %s to a minimum of %ld",
+		ALOGE("Cannot set %s to a minimum of %ld",
 			procname, *value);
 		return -1;
 	}
@@ -147,8 +137,7 @@ void init_kernel_rng( void )
 
 	random_fd = open(arguments->random_name, O_RDWR);
 	if (random_fd == -1) {
-		message_strerr(LOG_ERR, errno, "can't open %s",
-			arguments->random_name);
+		ALOGE("can't open %s", arguments->random_name);
 		die(EXIT_USAGE);
 	}
 
@@ -199,9 +188,9 @@ static void random_add_entropy(void *buf, size_t size)
 
 	entropy.size = size;
 	memcpy(entropy.data, buf, size);
-	
+
 	if (ioctl(random_fd, RNDADDENTROPY, &entropy) != 0) {
-		message_strerr(LOG_ERR, errno, "RNDADDENTROPY failed");
+		ALOGE("RNDADDENTROPY failed");
 		exitstatus = EXIT_OSERR;
 		kill(masterprocess, SIGTERM);
 		pthread_exit(NULL);
@@ -247,7 +236,7 @@ static void random_sleep( void )
 			if (errno != EINTR) break;
 		}
 	}
-				
+
 }
 
 void *do_rng_data_sink_loop( void *trash )
@@ -258,10 +247,6 @@ void *do_rng_data_sink_loop( void *trash )
 	unsigned char *p;
 	struct timeval start, stop;
 
-	/* Warn of KERNEL_LINUX_24 entropy correction */
-	if (kernel == KERNEL_LINUX_24)
-		message(LOG_INFO, "Activating Linux kernel 2.4 entropy accounting bug workaround");
-
 	/*  Startup: Wait until we get some data to work on */
 	while (ISBUFFIFO_EMPTY(accepted)) {
 		if (gotsigterm) pthread_exit(NULL);
@@ -271,14 +256,14 @@ void *do_rng_data_sink_loop( void *trash )
 		pthread_mutex_unlock(&rng_buffer_ready_mutex);
 	}
 
-	message(LOG_INFO, "entropy feed to the kernel ready");
+	ALOGI("entropy feed to the kernel ready");
 
 	for (;;) {
 		if (gotsigterm) pthread_exit(NULL);
 
 		if (ISBUFFIFO_NONEMPTY(accepted)) {
 			BUFFIFO_READ(accepted, i);
-			
+
 			if (starving) {
 				gettimeofday(&stop, 0);
 				pthread_mutex_lock(&rng_stats.group3_mutex);

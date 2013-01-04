@@ -18,12 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#define _GNU_SOURCE
-
-#ifndef HAVE_CONFIG_H
-#error Invalid or missing autoconf build environment
-#endif
-
 #include "rng-tools-config.h"
 
 /* For printf types macros (PRIu64) */

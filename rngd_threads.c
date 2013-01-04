@@ -17,12 +17,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#define _GNU_SOURCE
-
-#ifndef HAVE_CONFIG_H
-#error Invalid or missing autoconf build environment
-#endif
-
 #include "rng-tools-config.h"
 
 #include <unistd.h>
@@ -44,7 +38,7 @@
 
 /* Buffers for RNG data */
 int rng_buffers = 0;		/* number of active buffers */
-rng_buffer_t **rng_buf = NULL;	/* vector of pointers to the buffers */	
+rng_buffer_t **rng_buf = NULL;	/* vector of pointers to the buffers */
 
 /*
  * FIFOs to pass blocks among the threads
@@ -73,7 +67,7 @@ int getbuffifo_count(struct buf_fifo *fifo)
 /* handy malloc()/calloc() error handler */
 void *test_malloc(void *p) {
 	if (!p) {
-		message(LOG_ERR, "cannot allocate buffers");
+		ALOGE("cannot allocate buffers");
 		die(EXIT_OSERR);
 	}
 	return p;
@@ -110,7 +104,7 @@ void init_rng_buffers(int n)
 
 		rng_buf[i] = test_malloc(malloc(FIPS_RNG_BUFFER_SIZE));
 		if (mlock(rng_buf[i], FIPS_RNG_BUFFER_SIZE)) {
-			message_strerr(LOG_ERR, errno, "cannot lock buffers");
+			ALOGE("cannot lock buffers");
                         die(EXIT_OSERR);
 		}
 	}

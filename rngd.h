@@ -31,9 +31,11 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include <syslog.h>
 #include <time.h>
 #include <sys/time.h>
+#include <pthread.h>
+
+#include <cutils/log.h>
 
 #include "fips.h"
 #include "stats.h"

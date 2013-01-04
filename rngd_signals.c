@@ -7,7 +7,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -72,22 +72,20 @@ int enable_sigalrm(unsigned int seconds)
 		action.sa_flags = 0;
 		action.sa_handler = sigalrm_handler;
 		if (sigaction(SIGALRM, &action, NULL) < 0) {
-			message_strerr(LOG_ERR, errno,
-				"unable to install signal handler for SIGARLM");
+			ALOGE("unable to install signal handler for SIGARLM");
 			result = -1;
 		} else {
 			sigemptyset(&sigs);
 			sigaddset(&sigs, SIGALRM);
 			pthread_sigmask(SIG_UNBLOCK, &sigs, NULL);
-		
+
 			sigalrm_installed = 1;
 			sigalrm_owner = pthread_self();
 			gotsigalrm = 0;
 			alarm(seconds);
 		}
 	} else {
-		message(LOG_ERR,
-			"PROGRAM FAILURE DETECTED: two threads trying to use SIGARLM at the same time");
+		ALOGE("PROGRAM FAILURE DETECTED: two threads trying to use SIGARLM at the same time");
 		result = -1;
 	}
 	pthread_mutex_unlock(&sigalrm_mutex);
@@ -104,7 +102,7 @@ int disable_sigalrm(void)
 	pthread_sigmask(SIG_BLOCK, &sig, NULL);
 
 	pthread_mutex_lock(&sigalrm_mutex);
-	if (sigalrm_installed != 0 && 
+	if (sigalrm_installed != 0 &&
 			pthread_equal(pthread_self(), sigalrm_owner)) {
 		alarm(0);
 		sigalrm_installed = 0;
@@ -129,13 +127,11 @@ void init_sighandlers(void)
 
 	/* Handle SIGTERM and SIGINT the same way */
 	if (sigaction(SIGTERM, &action, NULL) < 0) {
-		message_strerr(LOG_ERR, errno,
-			"unable to install signal handler for SIGTERM");
+		ALOGE("unable to install signal handler for SIGTERM");
 		die(EXIT_OSERR);
 	}
 	if (sigaction(SIGINT, &action, NULL) < 0) {
-	        message_strerr(LOG_ERR, errno,
-			"unable to install signal handler for SIGINT");
+	        ALOGE("unable to install signal handler for SIGINT");
 	        die(EXIT_OSERR);
 	}
 
@@ -143,8 +139,7 @@ void init_sighandlers(void)
 	action.sa_flags = SA_RESTART;
 	action.sa_handler = sigusr1_handler;
 	if (sigaction(SIGUSR1, &action, NULL) < 0) {
-	        message_strerr(LOG_ERR, errno,
-			"unable to install signal handler for SIGUSR1");
+	        ALOGE("unable to install signal handler for SIGUSR1");
 	        die(EXIT_OSERR);
 	}
 
