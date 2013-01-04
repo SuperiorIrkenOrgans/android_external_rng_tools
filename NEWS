@@ -1,0 +1,25 @@
+Version 2-unofficial.mt (various releases)
+
+* Too many changes, check ChangeLog.  In short:
+  Multiple thread support, VIA padlock userspace driver,
+  better configurability.
+
+  Upstream for this *unofficial* version is
+  Henrique de Moraes Holschuh <hmh@hmh.eng.br>, please don't
+  bother the other Authors about any bugs I added to this
+  package.  Bug tracking should be done through the Debian
+  bug-tracking system, package "rng-tools" at
+  http://bugs.debian.org/rng-tools
+
+Version 2 (August 24, 2004):
+
+* Fixes and cleanups from Debian (Henrique de Moraes Holschuh)
+  Assures rngd works with 2.6 kernels.
+
+Version 1.1 (April 6, 2004):
+
+* update to recent autoconf/automake
+* add new rngtest program
+* various minor cleanups
+* much better FIPS testing
+

@@ -1,0 +1,255 @@
+Fri Jun 17 2011  Henrique de Moraes Holschuh <hmh@hmh.eng.br>
+	* Work around CPU errata: Nano xstore corrupts memory
+	* Support kernels 3.0 and later
+
+Sun May 02 2010  Henrique de Moraes Holschuh <hmh@hmh.eng.br>
+	* enable LARGE_FILE support, otherwise the VIA Padlock code
+	  won't work, thanks to Janis Hamme <anmeldung37@arcor.de>
+	  for the report;
+
+STILL NOT SENT UPSTREAM:
+
+	* Use multithreading to increase the available
+	  bandwidth, now rngd can read, process FIPS tests,
+	  and feed the kernel at the same time;
+	* Store data on buffers, that can be operated
+	  independently by the threads.  Default to
+	  triple-buffering;
+	* Lock memory used as buffers of random data;
+	* Add statistics, based on ideas from mtrngd.cpp by
+	  Martin Peck <coderman@charter.net>;
+	* Detect and deal with TRNGs stuck in a failing state,
+	  using an exponential backoff and eventually giving
+	  up and exiting;
+	* Add --rng-entropy option to set the TRNG entropy
+	  per bit of data;
+	* Add --trng with some presets for various TRNGs
+	  (currently VIA and Intel TRNGs);
+	* Extensively revamped and updated manpages;
+	* Configure /dev/random, /dev/hwrandom and pidfile
+	  location using autoconf, to avoid hardcoded defaults;
+	* Kill warnings on stats.c and rng-test.c on ia64
+	* Nice FAQish document (README.Debian)
+	* pidfile support for background mode
+
+        Cleanups suggested by Steve G <linux_4ever@yahoo.com>:
+	* fips.c: declare FIPS data array as const
+	* rngd_linux.c: small random_sleep cleanup
+	* stats.h, stats.c, rngd_entsource.c: avoid signed/unsigned 
+	  conversions
+	* rngd_entsource.c, rngtest.c: typecast void pointers 
+	  for pointer arithmetric
+
+	Other:
+	* fips.h: Minor cleanups
+	* configure.ac: use AS_HELP_STRING and AS_IF where applicable
+	* rngd.c: use option grouping on Argp options vector
+	* rngd.h, rngd.c, rngd_linux.c: precalculate poll timeout
+	  on init_kernel_rng.  Now arguments->poll_timeout is an int
+	  instead of a double
+	* rngd.c, rngtest.c: switch from sscanf to strto* functions for
+	  better error handling.  Validate upper bounds of input
+	  parameters when needed (to avoid overflows)
+	* rngd.c, rngd_linux.c, rngd.8.in: obtain kernel entropy pool
+	  size from /proc, and implement percentage-based 
+	  --fill-watermark.  Default fill watermark is now 50%
+	* rngd.8.in: Add comment about not changing entropy pool size
+	  with rngd running
+	* rngd.c, rngd_entsource.h, rngd_entsource.c, rngd_linux.h,
+	  rngd_linux.c: remove arguments to init_* functions, since they
+	  serve no useful purpose (as the modules they init access
+	  the arguments struct for other data anyway)
+	* rngd.c: call openlog with LOG_PID option
+	* rngd_linux.c: use gettimeofday and handle EINTR on poll() so
+	  as not to lose track of the random-step timing if we get
+	  interrupted
+	* rngd.h, rngd.c, rngd_linux.c, rngd.8.in: deprecate --timeout,
+	  rename it to --feed-interval (but keep -t short version). Rename
+	  poll_timeout to feed_interval in argument struct
+	* Makefile.am, rngd_signals.c, rngd_signals.h: add rngd_signals.c/h
+	* rngd.h, rngd.c, rngd_linux.c, rngd_entsource.c, rngd_threads.c,
+	  rng_threads.h: move signal handling code to rngd_signals.c/h
+	* rngd.h, rngd.c, rngd_entsource.c, rngd.8.in: new --rng-timeout
+	  option, to timeout the data source (currently only on startup)
+	  using the SIGALRM machinery
+	* Makefile.am, util.h, util.c: add util.c/h
+	* stats.h, stats.c: move elapsed_time function to util.c/.h
+	* rngd_linux.c, rngtest.c: use util.h
+	* rngd.h, rngd.c: use function for message(); new message_strerr()
+	  that is thread-safe
+	* rngd.c, rngd_linux.c, rngd_entsource.c, rngd_threads.c, 
+	  rngd_signal.c: use message_strerr()
+	* rngd.c, rngd_entsource.c, rngd_linux.c, rngd_threads.c, stats.c,
+	  util.c: add many assert() calls
+	* rngd_entsource.c, rngd_entsource.h, rngd.h, rngd.c, rngd.8.in: 
+	  implement entropy source drivers (--rng-driver), laying 
+	  groundwork for a VIA TRNG userspace driver in rngd.
+	* autogen.sh, .cvsignore: config.sub and config.guess
+	* configure.ac, rngd_entsource.c: --enable-viapadlock support
+	  This requires AC_CANONICAL_* which brings in config.sub/guess
+
+	* Work sponsored by Mekensleep.com, which donated unlimited access
+	  to a VIA Nehemiah system for the development:
+	  * New VIA PadLock TRNG high-performance user-space driver, 
+	    capable of delivering several Mbit/s of entropy
+
+Tue May 09 2004  Henrique de Moraes Holschuh <hmh@debian.org>
+
+	* rngd.h, rngd.c, rngd_linux.c, rngd.8.in: Let the user
+	  set the fill watermark explicitly, using the new -W
+	  command line option.  This gets rid of RNDGETPOOL
+	  usage, and of a hardcoded (yuck) setting of 50%.
+	  This change will make rngd work right with 2.6 kernels.
+
+Thu Apr 15 2004  Jeff Garzik  <jgarzik@pobox.com>
+
+	* Makefile.am, configure.ac: put common code in a lib
+
+Tue Apr  6 2004  Henrique de Moraes Holschuh <hmh@debian.org>
+
+	* rngd.c, rngtest.c: Add Copyright and license notices
+	  to --version output, as per the GNU guidelines;
+	  Improve --help output a little.
+	* rngtest.c: Cleanup logging, and exit with status 1
+	  when input drains before the first block is tested.
+	* rngtest.1.in: Minor text change.
+
+	Preparatory cleanup for merging the multithreaded 
+	code later:
+	* rngd.c: split globals to rngd.h; split linux
+	  /dev/random functionality to rngd_linux.c;
+	  split entropy source (/dev/hwrandom) functionality
+	  to rngd_entsource.c.
+	* rngd.h, rngd_linux.h, rngd_linux.c,
+	  rngd_entsource.h, rngd_entsource.c: add
+
+Tue Apr  6 2004  Jeff Garzik  <jgarzik@pobox.com>
+
+	* Release version 1.1.
+
+Fri Apr  5 2004  Henrique de Moraes Holschuh <hmh@debian.org>
+
+	Add rngtest application:
+	* Makefile.am: build rngtest.
+	* configure.ac: process rngtest.1.in.
+	* stats.h/stats.c: add.  Statistics based on ideas
+	  from mtrngd.cpp by Martin Peck <coderman@peertech.org>
+	* exits.h: add.
+	* rngtest.c: add.
+	* contrib/Makefile.am: remove rngtest.c.
+	* contrib/rngtest.c: remove.
+	* AUTHORS: add myself
+
+Fri Apr  5 2004  Henrique de Moraes Holschuh <hmh@debian.org>
+
+	* rngd.c: use C99 initializers syntax, and stop
+	  compilation if build env. is incomplete
+	* fips.c, fips.h: s/FIPS_TESTS/N_FIPS_TESTS/ and
+	  remove uneeded includes
+	* fips.c: reword error message when build env. is 
+	  incomplete, and also reorder some includes
+	* AUTHORS, configure.ac, fips.c, fips.h, rngd.c,
+	  rngd.8.in: Update Jeff Garzik's email address, remove
+	  outdated email address for Philipp Rumpf, on request
+	  by Jeff Garzik.
+	* configure.ac, rngd.c: Change bugreport address to
+	  Jeff Garzik's.
+
+Fri Apr  4 2004  Henrique de Moraes Holschuh <hmh@debian.org>
+	* Makefile.am: Add header and CVS Id tag; Do some cosmetic
+	  reformating; Add rngd_SOURCES.
+	* rngd.c: move all FIPS test code to fips.h/fips.c
+	* fips.h, fips.c: add.  
+	  + Update comments with more FIPS 140-2 trivia. 
+	  + Use a context structure to hold the FIPS test data.
+	  + Implement FIPS 140-2 4.9 Continuous Run test.
+	  + Add constants with the test names and bitmask for
+	    easier statistic reporting later.
+
+Fri Apr  3 2004  Henrique de Moraes Holschuh <hmh@debian.org>
+
+	* autogen.sh: Add comments with the required versions
+	  of the tools.  Call aclocal before autoheader.  
+	  Use --copy for automake invocation.
+	  Identify as version 1.1-devel.
+	* configure.in: rename to configure.ac
+	* configure.ac: Add GPL header.  Convert to autoconf
+	  2.50 macros, enable AM_MAINTAINER_MODE and disable
+	  useless cross-platform compatiblilty glue that
+	  isn't used anywere
+	* acconfig.h: remove
+	* .cvsignore: update for new autotools
+
+Sat Jul  5 2003  Jeff Garzik  <jgarzik@pobox.com>
+
+	* contrib/rngtest.c, rngd.8.in: s/intel_rng/hwrandom/
+
+	Noticed by Olivier NICOLAS.
+
+Sat Jul  5 2003  Sami Farin  <safari@users.sourceforge.net>
+
+	"updated" to FIPS140-2 standard, it has a bit more
+	strict constraints on randomness.. about one out of
+	1000 blocks read from /dev/urandom causes a failure.
+
+	also a bugfix:
+	checks for EINTR in xread (maybe not necessary with
+	i810 driver?) 
+
+Sat Jul  5 2003  Jeff Garzik  <jgarzik@pobox.com>
+
+	Rename to rng-tools, release version 1.0.
+	Rename input device to /dev/hwrandom in code and docs.
+	Rename config.h to rng-tools-config.h.
+
+Tue Mar 27 2001  Jeff Garzik  <jgarzik@mandrakesoft.com>
+
+	* rngd.c: Include config.h, pick up VERSION from
+	configure.in, via config.h.
+
+Mon Mar 26 2001  Philipp Rumpf  <prumpf@mandrakesoft.com>
+
+	* rngd.c: fail before the daemon() call if we
+	can't open /dev/random or /dev/intel_rng
+
+Mon Mar 26 2001  Philipp Rumpf  <prumpf@mandrakesoft.com>
+
+	* rngd.c: bugfixes, allow --timeout=0 to disable
+	periodical writes.
+
+Fri Mar 23 2001  Jeff Garzik  <jgarzik@mandrakesoft.com>
+
+	* rngd.c: Remove unused var.
+	Include stdlib.h for exit(3).
+
+Fri Mar 23 2001  Philipp Rumpf  <prumpf@mandrakesoft.com>
+
+	* rngd.c: fix argp_parse arguments
+
+Fri Mar 23 2001  Jeff Garzik  <jgarzik@mandrakesoft.com>
+
+	* configure.in: Change version in cvs
+
+	* Makefile.am, configure.in, rngd.8.in: Add man page.
+
+	* rngd.c: Update --help output, listing defaults.
+	Move 'arguments' local to top of file, call it
+	default_arguments.
+
+Fri Mar 23 2001  Philipp Rumpf  <prumpf@mandrakesoft.com>
+
+	* rngd.c: fix mixed-up options
+
+Fri Mar 23 2001  Philipp Rumpf  <prumpf@mandrakesoft.com>
+
+	* rngd.c: add argp support
+	* rngd.c: make random write granularity, poll timeout
+	  command line options
+	* rngd.c: optionally daemonize
+
+Fri Mar 23 2001  Jeff Garzik  <jgarzik@mandrakesoft.com>
+
+	* Makefile.am, configure.in, contrib/Makefile.am,
+	  autogen.sh, NEWS, ChangeLog, AUTHORS, README,
+	  contrib/Makefile.am: Add autoconf/automake support.
+
