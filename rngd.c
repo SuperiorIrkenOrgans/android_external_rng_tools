@@ -3,7 +3,7 @@
  *
  * rngd reads data from a hardware random number generator, verifies it
  * looks like random data, and adds it to /dev/random's entropy store.
- * 
+ *
  * In theory, this should allow you to read very quickly from
  * /dev/random; rngd also adds bytes to the entropy store periodically
  * when it's full, which makes predicting the entropy store's contents
@@ -17,7 +17,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
