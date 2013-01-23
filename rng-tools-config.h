@@ -17,7 +17,7 @@
 #define PACKAGE_NAME "rng-tools"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "rng-tools 2-unofficial-mt.14"
+#define PACKAGE_STRING "rng-tools 2.14"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "rng-tools"
@@ -26,7 +26,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2-unofficial-mt.14"
+#define PACKAGE_VERSION "2.14"
 
 /* Name of the pidfile for rngd */
 #define PIDFILE "/data/rngd.pid"
@@ -35,7 +35,7 @@
 #define SYSLOG_FACILITY LOG_DAEMON
 
 /* Version number of package */
-#define VERSION "2-unofficial-mt.14"
+#define VERSION "2.14"
 
 /* Include code for VIA PadLock TRNG driver */
 #define VIA_ENTSOURCE_DRIVER 1
@@ -46,7 +46,11 @@
 #endif
 
 /* Number of bits in a file offset, on hosts where this is settable. */
-/* #undef _FILE_OFFSET_BITS */
+#define _FILE_OFFSET_BITS 64
+ 
+/* Paths to sysfs sleep/wake nodes */
+#define SYSFS_SLEEP_NODE "/sys/power/wait_for_fb_sleep"
+#define SYSFS_WAKE_NODE "/sys/power/wait_for_fb_wake" 
 
 /* Define for large files, on AIX-style hosts. */
 /* #undef _LARGE_FILES */

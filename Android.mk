@@ -6,7 +6,7 @@ LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES:= \
-	rngd.c stats.c rngd_entsource.c rngd_threads.c rngd_signals.c rngd_linux.c fips.c util.c
+	rngd.c stats.c rngd_entsource.c rngd_threads.c rngd_signals.c rngd_linux.c fips.c util.c viapadlock_engine.c
 
 LOCAL_SHARED_LIBRARIES += \
         libcutils 
