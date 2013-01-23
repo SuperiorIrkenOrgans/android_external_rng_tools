@@ -32,6 +32,7 @@
 #include <time.h>
 #include <string.h>
 
+#include "log.h"
 #include <assert.h>
 
 #include "fips.h"

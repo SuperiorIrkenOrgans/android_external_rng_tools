@@ -28,6 +28,7 @@
 #include <sys/time.h>
 #include <sys/utsname.h>
 
+#include "log.h"
 #include "util.h"
 
 #include <assert.h>

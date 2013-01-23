@@ -43,6 +43,7 @@
 #include <argp.h>
 #include <signal.h>
 
+#include "log.h"
 #include "fips.h"
 #include "stats.h"
 #include "exits.h"

@@ -29,6 +29,7 @@
 
 #include <assert.h>
 
+#include "log.h"
 #include "rngd.h"
 #include "fips.h"
 #include "stats.h"

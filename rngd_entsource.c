@@ -37,7 +37,7 @@
 
 #include <assert.h>
 
-#include <cutils/log.h>
+#include "log.h"
 
 #include "rngd.h"
 #include "fips.h"

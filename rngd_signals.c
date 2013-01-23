@@ -26,6 +26,7 @@
 #include <signal.h>
 #include <errno.h>
 
+#include "log.h"
 #include "rngd.h"
 #include "exits.h"
 #include "rngd_signals.h"
