@@ -37,7 +37,7 @@
 
 #include <assert.h>
 
-#include "log.h"
+#include <cutils/log.h>
 
 #include "rngd.h"
 #include "fips.h"
@@ -122,7 +122,7 @@ static int xread(void *buf, size_t size, unsigned int abortonsigalrm)
 		} while ((r == -1) && ((errno == EINTR) || (errno == EAGAIN)));
 		if (r < 0) break;
 		if (r == 0) {
-			ALOGE("entropy source exhausted!");
+			LOGE("entropy source exhausted!");
 			return -1;
 		}
 		off += r;
@@ -133,7 +133,7 @@ static int xread(void *buf, size_t size, unsigned int abortonsigalrm)
 	}
 
 	if (size != 0) {
-		ALOGE("error reading from entropy source:");
+		LOGE("error reading from entropy source:");
 		exitstatus = EXIT_IOERR;
 		return -1;
 	}
@@ -166,12 +166,12 @@ void init_entropy_source( void )
 		case RNGD_ENTSOURCE_UNIXSTREAM:
 			rng_fd = open(arguments->rng_name, O_RDONLY);
 			if (rng_fd == -1) {
-				ALOGE("can't open %s", arguments->rng_name);
+				LOGE("can't open %s", arguments->rng_name);
 				die(EXIT_FAIL);
 			}
 			break;
 		default:
-			ALOGE("Unknown entropy source driver, internal program error!");
+			LOGE("Unknown entropy source driver, internal program error!");
 			die(EXIT_USAGE);
 	}
 
@@ -326,16 +326,16 @@ void *do_rng_fips_test_loop( void *trash )
 					if (fips_result & fips_test_mask[j])
 						rng_stats.fips_failures[j]++;
 				pthread_mutex_unlock(&rng_stats.group2_mutex);
-				ALOGI("block failed FIPS test: 0x%02x",
+				LOGI("block failed FIPS test: 0x%02x",
 					fips_result);
 
 				if (warnuser && throttling) {
 					warnuser = 0;
-					ALOGI("Too many consecutive bad blocks of data, check entropy source!");
-					ALOGV("Throttling down entropy source read speed...");
+					LOGI("Too many consecutive bad blocks of data, check entropy source!");
+					LOGV("Throttling down entropy source read speed...");
 				}
 				if (throttling > MAX_THROTTLE_LEVEL) {
-					ALOGE("Too many bad blocks, entropy source malfunction assumed");
+					LOGE("Too many bad blocks, entropy source malfunction assumed");
 					exitstatus = EXIT_FAIL;
 					kill(masterprocess, SIGTERM);
 					pthread_exit(NULL);
@@ -345,7 +345,7 @@ void *do_rng_fips_test_loop( void *trash )
 				if (throttling) {
 					throttling = 0;
 					warnuser = 1;
-					ALOGI("entropy source recovered");
+					LOGI("entropy source recovered");
 				}
 
 				pthread_mutex_lock(&rng_buffer_ready_mutex);

@@ -26,7 +26,7 @@
 #include <signal.h>
 #include <errno.h>
 
-#include "log.h"
+#include <cutils/log.h>
 #include "rngd.h"
 #include "exits.h"
 #include "rngd_signals.h"
@@ -73,7 +73,7 @@ int enable_sigalrm(unsigned int seconds)
 		action.sa_flags = 0;
 		action.sa_handler = sigalrm_handler;
 		if (sigaction(SIGALRM, &action, NULL) < 0) {
-			ALOGE("unable to install signal handler for SIGARLM");
+			LOGE("unable to install signal handler for SIGARLM");
 			result = -1;
 		} else {
 			sigemptyset(&sigs);
@@ -86,7 +86,7 @@ int enable_sigalrm(unsigned int seconds)
 			alarm(seconds);
 		}
 	} else {
-		ALOGE("PROGRAM FAILURE DETECTED: two threads trying to use SIGARLM at the same time");
+		LOGE("PROGRAM FAILURE DETECTED: two threads trying to use SIGARLM at the same time");
 		result = -1;
 	}
 	pthread_mutex_unlock(&sigalrm_mutex);
@@ -128,11 +128,11 @@ void init_sighandlers(void)
 
 	/* Handle SIGTERM and SIGINT the same way */
 	if (sigaction(SIGTERM, &action, NULL) < 0) {
-		ALOGE("unable to install signal handler for SIGTERM");
+		LOGE("unable to install signal handler for SIGTERM");
 		die(EXIT_OSERR);
 	}
 	if (sigaction(SIGINT, &action, NULL) < 0) {
-	        ALOGE("unable to install signal handler for SIGINT");
+	        LOGE("unable to install signal handler for SIGINT");
 	        die(EXIT_OSERR);
 	}
 
@@ -140,7 +140,7 @@ void init_sighandlers(void)
 	action.sa_flags = SA_RESTART;
 	action.sa_handler = sigusr1_handler;
 	if (sigaction(SIGUSR1, &action, NULL) < 0) {
-	        ALOGE("unable to install signal handler for SIGUSR1");
+	        LOGE("unable to install signal handler for SIGUSR1");
 	        die(EXIT_OSERR);
 	}
 

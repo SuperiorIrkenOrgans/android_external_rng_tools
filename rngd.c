@@ -27,7 +27,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include "log.h"
+#include <cutils/log.h>
 
 #include "rng-tools-config.h"
 
@@ -145,7 +145,7 @@ static struct trng_params trng_parameters[] = {
  */
 void die(int status)
 {
-	if (am_daemon) ALOGE("Exiting with status %d...", status);
+	if (am_daemon) LOGE("Exiting with status %d...", status);
 	exit(status);
 }
 
@@ -162,7 +162,7 @@ static void get_lock(const char* pidfile_name)
 	if (!daemon_lockfp) {
 		if (((daemon_lockfd = open(pidfile_name, O_RDWR|O_CREAT, 0644)) == -1)
 		|| ((daemon_lockfp = fdopen(daemon_lockfd, "r+"))) == NULL) {
-			ALOGE("can't open or create %s", pidfile_name);
+			LOGE("can't open or create %s", pidfile_name);
 		        die(EXIT_USAGE);
 		}
 		fcntl(daemon_lockfd, F_SETFD, 1);
@@ -175,10 +175,10 @@ static void get_lock(const char* pidfile_name)
 			if (errno == EWOULDBLOCK) {
 				rewind(daemon_lockfp);
 				fscanf(daemon_lockfp, "%d", &otherpid);
-				ALOGE("can't lock %s, running daemon's pid may be %d",
+				LOGE("can't lock %s, running daemon's pid may be %d",
 					pidfile_name, otherpid);
 			} else {
-				ALOGE("can't lock %s", pidfile_name);
+				LOGE("can't lock %s", pidfile_name);
 			}
 			die(EXIT_USAGE);
 		}
@@ -213,19 +213,19 @@ static void dump_rng_stats(void)
 
 	pthread_mutex_lock(&rng_stats.group1_mutex);
 
-	ALOGV("%d bits received from HRNG source", rng_stats.bytes_received * 8);
+	LOGV("%d bits received from HRNG source", rng_stats.bytes_received * 8);
 
 	pthread_mutex_unlock(&rng_stats.group1_mutex);
 	pthread_mutex_lock(&rng_stats.group3_mutex);
 
-	ALOGV("%d bits send to kernel pool", rng_stats.bytes_sent * 8);
-	ALOGV("%d entropy added to kernel pool", rng_stats.entropy_sent);
+	LOGV("%d bits send to kernel pool", rng_stats.bytes_sent * 8);
+	LOGV("%d entropy added to kernel pool", rng_stats.entropy_sent);
 
 	pthread_mutex_unlock(&rng_stats.group3_mutex);
 	pthread_mutex_lock(&rng_stats.group2_mutex);
 
-	ALOGV("%d FIPS 140-2 successes", rng_stats.good_fips_blocks);
-	ALOGV("%d FIPS 140-2 failures", rng_stats.bad_fips_blocks);
+	LOGV("%d FIPS 140-2 successes", rng_stats.good_fips_blocks);
+	LOGV("%d FIPS 140-2 failures", rng_stats.bad_fips_blocks);
 
 	for (j = 0; j < N_FIPS_TESTS; j++) {
 	//	message(LOG_INFO, dump_stat_counter(buf, sizeof(buf), fips_test_names[j],
@@ -266,7 +266,7 @@ int main(int argc, char **argv)
 
 	/* Make sure kernel is supported */
 	if (kernel == KERNEL_UNSUPPORTED) {
-		ALOGE("Unsupported kernel detected, exiting...");
+		LOGE("Unsupported kernel detected, exiting...");
 		die (EXIT_OSERR);
 	}
 
@@ -291,7 +291,7 @@ int main(int argc, char **argv)
 		get_lock(arguments->pidfile_name);
 
 		if (daemon(0, 0) < 0) {
-			ALOGE("can't daemonize");
+			LOGE("can't daemonize");
 			return EXIT_OSERR;
 		}
 
@@ -302,7 +302,7 @@ int main(int argc, char **argv)
 	}
 
 	masterprocess = getpid();
-	ALOGI(PROGNAME " " VERSION " starting up...");
+	LOGI(PROGNAME " " VERSION " starting up...");
 
 	/* post-fork initialization */
 	init_rng_buffers(arguments->rng_buffers);
@@ -312,7 +312,7 @@ int main(int argc, char **argv)
 	if (pthread_create(&t1, NULL, &do_rng_data_source_loop, NULL) |
 	    pthread_create(&t2, NULL, &do_rng_fips_test_loop, NULL ) |
 	    pthread_create(&t3, NULL, &do_rng_data_sink_loop, NULL )) {
-		ALOGE("Insufficient resources to start threads");
+		LOGE("Insufficient resources to start threads");
 		die(EXIT_OSERR);
 	}
 
@@ -331,9 +331,9 @@ int main(int argc, char **argv)
 	}
 
 	if (exitstatus == EXIT_SUCCESS)
-		ALOGI("Exiting...");
+		LOGI("Exiting...");
 	else
-		ALOGE("Exiting with status %d", exitstatus);
+		LOGE("Exiting with status %d", exitstatus);
 
 	exit(exitstatus);
 }

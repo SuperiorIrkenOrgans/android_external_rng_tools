@@ -41,7 +41,7 @@
 
 #include <assert.h>
 
-#include "log.h"
+#include <cutils/log.h>
 #include "rngd.h"
 #include "fips.h"
 #include "stats.h"
@@ -87,7 +87,7 @@ static int get_rng_proc_parameter(const char* param, long int *value)
 	if (fp != NULL) error |= fclose(fp);
 
 	if (error) {
-		ALOGW("Cannot read %s", procname);
+		LOGW("Cannot read %s", procname);
 		return -1;
 	}
 	return 0;
@@ -112,7 +112,7 @@ static int set_rng_proc_parameter(const char* param, long int *value)
 		if ( *value > curvalue ) {
 			rewind(fp);
 			fprintf(fp, "%ld\n", *value);
-			ALOGI("Setting %s to %ld", procname, *value);
+			LOGI("Setting %s to %ld", procname, *value);
 		} else {
 			*value = curvalue;
 		}
@@ -138,7 +138,7 @@ void init_kernel_rng( void )
 
 	random_fd = open(arguments->random_name, O_RDWR);
 	if (random_fd == -1) {
-		ALOGE("can't open %s", arguments->random_name);
+		LOGE("can't open %s", arguments->random_name);
 		die(EXIT_USAGE);
 	}
 
@@ -191,7 +191,7 @@ static void random_add_entropy(void *buf, size_t size)
 	memcpy(entropy.data, buf, size);
 
 	if (ioctl(random_fd, RNDADDENTROPY, &entropy) != 0) {
-		ALOGE("RNDADDENTROPY failed");
+		LOGE("RNDADDENTROPY failed");
 		exitstatus = EXIT_OSERR;
 		kill(masterprocess, SIGTERM);
 		pthread_exit(NULL);
@@ -257,7 +257,7 @@ void *do_rng_data_sink_loop( void *trash )
 		pthread_mutex_unlock(&rng_buffer_ready_mutex);
 	}
 
-	ALOGI("entropy feed to the kernel ready");
+	LOGI("entropy feed to the kernel ready");
 
 	for (;;) {
 		if (gotsigterm) pthread_exit(NULL);

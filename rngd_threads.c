@@ -29,7 +29,7 @@
 
 #include <assert.h>
 
-#include "log.h"
+#include <cutils/log.h>
 #include "rngd.h"
 #include "fips.h"
 #include "stats.h"
@@ -68,7 +68,7 @@ int getbuffifo_count(struct buf_fifo *fifo)
 /* handy malloc()/calloc() error handler */
 void *test_malloc(void *p) {
 	if (!p) {
-		ALOGE("cannot allocate buffers");
+		LOGE("cannot allocate buffers");
 		die(EXIT_OSERR);
 	}
 	return p;
@@ -105,7 +105,7 @@ void init_rng_buffers(int n)
 
 		rng_buf[i] = test_malloc(malloc(FIPS_RNG_BUFFER_SIZE));
 		if (mlock(rng_buf[i], FIPS_RNG_BUFFER_SIZE)) {
-			ALOGE("cannot lock buffers");
+			LOGE("cannot lock buffers");
                         die(EXIT_OSERR);
 		}
 	}
